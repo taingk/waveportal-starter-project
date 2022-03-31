@@ -21,7 +21,7 @@
 .bio {
   text-align: center;
   color: gray;
-  margin-top: 16px;
+  margin: 50px 0 20px 0;
 }
 
 .waveButton {
@@ -30,5 +30,4 @@
   padding: 8px;
   border: 0;
   border-radius: 5px;
-  
 }
