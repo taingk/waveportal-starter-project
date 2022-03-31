@@ -40,14 +40,10 @@ export default function App() {
      */
     try {
       const { ethereum } = window;
-
       if (!ethereum) {
         console.log("Make sure you have metamask!");
         return;
-      } else {
-        console.log("We have the ethereum object", ethereum);
       }
-
       /*
        * Check if we're authorized to access the user's wallet
        */
@@ -55,7 +51,6 @@ export default function App() {
 
       if (accounts.length) {
         const account = accounts[0];
-        console.log("Found an authorized account:", account);
         setCurrentAccount(account);
       } else {
         console.log("No authorized account found");
@@ -90,6 +85,11 @@ export default function App() {
    */
   useEffect(() => {
     const getTotalWaves = async () => {
+      const { ethereum } = window;
+      if (!ethereum) {
+        console.log("Make sure you have metamask!");
+        return;
+      }
       const baseTotalWaves = await getWavePortal().getTotalWaves();
       setTotalWaves(baseTotalWaves.toNumber());
     };
