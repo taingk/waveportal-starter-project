@@ -89,12 +89,12 @@ export default function App() {
    * This runs our function when the page loads.
    */
   useEffect(() => {
-    checkIfWalletIsConnected();
     const getTotalWaves = async () => {
       const baseTotalWaves = await getWavePortal().getTotalWaves();
       setTotalWaves(baseTotalWaves.toNumber());
     };
     getTotalWaves();
+    checkIfWalletIsConnected();
   }, []);
 
   const wave = async () => {
