@@ -5,7 +5,7 @@ import LoadingBar from "react-top-loading-bar";
 import "./App.css";
 import abi from "./utils/WavePortal.json";
 
-const contractAddress = "0xADCdf4cC30995FC64cc2C6D8F59Fc5b8ce07F01d";
+const contractAddress = "0x0A762404535108B3584098222AAb67aF392cFaaf";
 const contractABI = abi.abi;
 
 const getWavePortal = () => {
@@ -14,8 +14,6 @@ const getWavePortal = () => {
   if (!ethereum) {
     console.log("Make sure you have metamask!");
     return;
-  } else {
-    console.log("We have the ethereum object", ethereum);
   }
 
   const provider = new ethers.providers.Web3Provider(ethereum);
