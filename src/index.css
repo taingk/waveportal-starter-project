@@ -10,9 +10,15 @@ body {
     rgba(162, 254, 255, 1) 0%,
     rgba(255, 190, 248, 1) 100%
   );
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 code {
   font-family: "Cascadia Code", source-code-pro, Menlo, Monaco, Consolas,
     "Courier New", monospace;
+}
+
+body::-webkit-scrollbar {
+  display: none;
 }

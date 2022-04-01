@@ -84,8 +84,6 @@ export default function App() {
     }
   };
 
-  getWavePortal().on("NewWave", getAllWaves);
-
   const checkIfWalletIsConnected = async () => {
     /*
      * First make sure we have access to window.ethereum
@@ -105,6 +103,9 @@ export default function App() {
         const account = accounts[0];
         setCurrentAccount(account);
         getAllWaves();
+        getWavePortal().on("NewWave", getAllWaves);
+        const baseTotalWaves = await getWavePortal().getTotalWaves();
+        setTotalWaves(baseTotalWaves.toNumber());
       } else {
         console.log("No authorized account found");
       }
@@ -137,16 +138,6 @@ export default function App() {
    * This runs our function when the page loads.
    */
   useEffect(() => {
-    const getTotalWaves = async () => {
-      const { ethereum } = window;
-      if (!ethereum) {
-        console.log("Make sure you have metamask!");
-        return;
-      }
-      const baseTotalWaves = await getWavePortal().getTotalWaves();
-      setTotalWaves(baseTotalWaves.toNumber());
-    };
-    getTotalWaves();
     checkIfWalletIsConnected();
   }, []);
 
@@ -190,51 +181,55 @@ export default function App() {
           {totalWaves ? "s !" : " :("}
         </div>
 
-        <form className="form" onSubmit={wave}>
-          <label htmlFor="message">Type a message :</label>
-          <div className="inputWrapper">
-            <input
-              id="message"
-              name="message"
-              type="text"
-              className="messageInput"
-              onChange={(e) => setMessage(e.target.value)}
-            />
-            <button type="submit" className="submitButton">
-              Send{" "}
-              <span role="img" aria-label="wave">
-                👋
-              </span>
-            </button>
-          </div>
-        </form>
-        {!currentAccount && (
+        {!currentAccount ? (
           <button className="waveButton" onClick={connectWallet}>
             Connect Wallet
           </button>
+        ) : (
+          <>
+            <form className="form" onSubmit={wave}>
+              <label htmlFor="message">Type a message :</label>
+              <div className="inputWrapper">
+                <input
+                  id="message"
+                  name="message"
+                  type="text"
+                  className="messageInput"
+                  onChange={(e) => setMessage(e.target.value)}
+                />
+                <button type="submit" className="submitButton">
+                  Send{" "}
+                  <span role="img" aria-label="wave">
+                    👋
+                  </span>
+                </button>
+              </div>
+            </form>
+
+            {allWaves.map((wave, index) => (
+              <div
+                key={index}
+                style={{
+                  backgroundColor: "rgb(239, 239, 239)",
+                  marginBottom: "16px",
+                  padding: "8px",
+                  borderRadius: "5px",
+                }}
+              >
+                <div>
+                  Message: <br />
+                  {wave.message ? wave.message : "No message :("}
+                </div>
+                <br />
+                <div>From: {wave.address}</div>
+                <div>
+                  Date:{" "}
+                  {dayjs(wave.timestamp.toString()).format("HH:mm MM/DD/YYYY")}
+                </div>
+              </div>
+            ))}
+          </>
         )}
-        {allWaves.map((wave, index) => (
-          <div
-            key={index}
-            style={{
-              backgroundColor: "rgb(239, 239, 239)",
-              marginTop: "16px",
-              padding: "8px",
-              borderRadius: "5px",
-            }}
-          >
-            <div>
-              Message: <br />
-              {wave.message ? wave.message : "No message :("}
-            </div>
-            <br />
-            <div>From: {wave.address}</div>
-            <div>
-              Date:{" "}
-              {dayjs(wave.timestamp.toString()).format("HH:mm MM/DD/YYYY")}
-            </div>
-          </div>
-        ))}
       </div>
     </div>
   );
