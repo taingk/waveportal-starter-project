@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { ethers } from "ethers";
 import LoadingBar from "react-top-loading-bar";
+import dayjs from "dayjs";
 
 import "./App.css";
 import abi from "./utils/WavePortal.json";
@@ -30,7 +31,60 @@ const getWavePortal = () => {
 export default function App() {
   const [currentAccount, setCurrentAccount] = useState("");
   const [totalWaves, setTotalWaves] = useState(0);
+  const [message, setMessage] = useState("");
   const ref = useRef(null);
+  /*
+   * All state property to store all waves
+   */
+  const [allWaves, setAllWaves] = useState([]);
+
+  /*
+   * Create a method that gets all waves from your contract
+   */
+  const getAllWaves = async () => {
+    try {
+      const { ethereum } = window;
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const wavePortalContract = new ethers.Contract(
+          contractAddress,
+          contractABI,
+          signer
+        );
+
+        /*
+         * Call the getAllWaves method from your Smart Contract
+         */
+        const waves = await wavePortalContract.getAllWaves();
+
+        /*
+         * We only need address, timestamp, and message in our UI so let's
+         * pick those out
+         */
+        let wavesCleaned = [];
+        waves.forEach((wave) => {
+          wavesCleaned.push({
+            address: wave.waver,
+            timestamp: new Date(wave.timestamp * 1000),
+            message: wave.message,
+          });
+        });
+
+        /*
+         * Store our data in React State
+         */
+        wavesCleaned.sort((x, y) => y.timestamp - x.timestamp);
+        setAllWaves(wavesCleaned);
+      } else {
+        console.log("Ethereum object doesn't exist!");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  getWavePortal().on("NewWave", getAllWaves);
 
   const checkIfWalletIsConnected = async () => {
     /*
@@ -50,6 +104,7 @@ export default function App() {
       if (accounts.length) {
         const account = accounts[0];
         setCurrentAccount(account);
+        getAllWaves();
       } else {
         console.log("No authorized account found");
       }
@@ -95,14 +150,15 @@ export default function App() {
     checkIfWalletIsConnected();
   }, []);
 
-  const wave = async () => {
+  const wave = async (e) => {
+    e.preventDefault();
     try {
       const { ethereum } = window;
       if (ethereum) {
         /*
          * Execute the actual wave from your smart contract
          */
-        const waveTxn = await getWavePortal().wave();
+        const waveTxn = await getWavePortal().wave(message);
         ref.current.continuousStart(6);
         console.log("Mining...", waveTxn.hash);
 
@@ -130,19 +186,55 @@ export default function App() {
           your Ethereum wallet and dont be shy !
           <br />
           <br />
-          Already {totalWaves} wave{totalWaves ? "s" : ""} !
+          {totalWaves ? "Already" : ""} {totalWaves} wave
+          {totalWaves ? "s !" : " :("}
         </div>
-        <button className="waveButton" onClick={wave}>
-          Say hello{" "}
-          <span role="img" aria-label="wave">
-            👋
-          </span>
-        </button>
+
+        <form className="form" onSubmit={wave}>
+          <label htmlFor="message">Type a message :</label>
+          <div className="inputWrapper">
+            <input
+              id="message"
+              name="message"
+              type="text"
+              className="messageInput"
+              onChange={(e) => setMessage(e.target.value)}
+            />
+            <button type="submit" className="submitButton">
+              Send{" "}
+              <span role="img" aria-label="wave">
+                👋
+              </span>
+            </button>
+          </div>
+        </form>
         {!currentAccount && (
           <button className="waveButton" onClick={connectWallet}>
             Connect Wallet
           </button>
         )}
+        {allWaves.map((wave, index) => (
+          <div
+            key={index}
+            style={{
+              backgroundColor: "rgb(239, 239, 239)",
+              marginTop: "16px",
+              padding: "8px",
+              borderRadius: "5px",
+            }}
+          >
+            <div>
+              Message: <br />
+              {wave.message ? wave.message : "No message :("}
+            </div>
+            <br />
+            <div>From: {wave.address}</div>
+            <div>
+              Date:{" "}
+              {dayjs(wave.timestamp.toString()).format("HH:mm MM/DD/YYYY")}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
