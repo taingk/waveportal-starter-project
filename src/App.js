@@ -6,7 +6,7 @@ import dayjs from "dayjs";
 import "./App.css";
 import abi from "./utils/WavePortal.json";
 
-const contractAddress = "0xFb4e347600fa94190Fdf865aC86bD8cA298C1eE2";
+const contractAddress = "0x050B9A54fE9b50ad1AA91d031Dd7A049EC70f019";
 const contractABI = abi.abi;
 
 const getWavePortal = () => {
@@ -149,7 +149,9 @@ export default function App() {
         /*
          * Execute the actual wave from your smart contract
          */
-        const waveTxn = await getWavePortal().wave(message);
+        const waveTxn = await getWavePortal().wave(message, {
+          gasLimit: 300000,
+        });
         ref.current.continuousStart(6);
         console.log("Mining...", waveTxn.hash);
 
