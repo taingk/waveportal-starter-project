@@ -6,7 +6,7 @@ import dayjs from "dayjs";
 import "./App.css";
 import abi from "./utils/WavePortal.json";
 
-const contractAddress = "0x67FA5497b85511CaD347CAA35248f033A3D05024";
+const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 const contractABI = abi.abi;
 
 const getWavePortal = () => {
